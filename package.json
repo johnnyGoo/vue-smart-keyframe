@@ -1,7 +1,7 @@
 {
   "name": "vue-smart-keyframe",
   "description": "A Vue.js Component",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Johnny <157781745@qq.com>",
   "license": "MIT",
   "main": "dist/vue-smart-keyframe.js",
@@ -10,7 +10,6 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
-    "keyframe": "^2.0.0"
   },
   "devDependencies": {
     "vue": "^2.5.2",
