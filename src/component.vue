@@ -12,7 +12,18 @@
 
     // 注册
 
-    let defaultAttr = {opacity:1,x: 0, y: 0, z: 0, rotateX: 0, rotateY: 0, rotateZ: 0, scaleX: 1, scaleY: 1, scaleZ: 1}
+    let defaultAttr = {
+        opacity: 1,
+        x: 0,
+        y: 0,
+        z: 0,
+        rotateX: 0,
+        rotateY: 0,
+        rotateZ: 0,
+        scaleX: 1,
+        scaleY: 1,
+        scaleZ: 1
+    }
 
 
     function buildKeys(frame, lastFrame) {
@@ -36,6 +47,31 @@
     }
 
 
+
+    function fixCss(name, attr) {
+        let cssObj = {};
+        if (!attr || attr === '') {
+            return cssObj;
+        }
+        cssObj[name] = attr;
+        cssObj['-webkit-' + name] = attr;
+        cssObj['-moz-' + name] = attr;
+        cssObj['-ms-' + name] = attr;
+        cssObj['-o-' + name] = attr;
+        return cssObj;
+    }
+
+    function css(el, obj) {
+        if (el && obj) {
+            for (let i in obj) {
+                if (el.style) {
+                    el.style[i] = obj[i];
+                }
+            }
+        }
+    };
+
+
     export default {
         name: 'vue-smart-keyframe',
         // 声明 props
@@ -57,6 +93,10 @@
                 defalut: function () {
                     return []
                 }
+            },
+            transitionTime:{
+                type: String,
+                defalut: '0s'
             }
         },
         data: function () {
@@ -86,9 +126,16 @@
 // From (0% -> 50%) move the div left 150px
 // then from (50% -> 100%) move the div up 50px.
 
-            function update(x, y, z, rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ,opacity) {
-                self.$refs.dom.style.transform = `translateX(${x}px) translateY(${y}px) translateZ(${z}px) scaleX(${scaleX}) scaleY(${scaleY}) scaleZ(${scaleZ}) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
-                self.$refs.dom.style.transition = `transform 0.1s`;
+
+           // self.$refs.dom.style.transition = `transform 0.1s`;
+
+
+
+
+            function update(x, y, z, rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ, opacity) {
+              //  self.$refs.dom.style.transform = `translateX(${x}px) translateY(${y}px) translateZ(${z}px) scaleX(${scaleX}) scaleY(${scaleY}) scaleZ(${scaleZ}) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
+                let obj = fixCss('transform', `translateX(${x}px) translateY(${y}px) translateZ(${z}px) scaleX(${scaleX}) scaleY(${scaleY}) scaleZ(${scaleZ}) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`)
+                css(self.$refs.dom, obj);
                 self.$refs.dom.style.opacity = opacity;
 
             }
@@ -103,7 +150,7 @@
                 function buildFun(frame) {
                     function FrameFun(d) {
                         let obj = getValues(frame, d);
-                        update(obj.x, obj.y, obj.z, obj.rotateX, obj.rotateY, obj.rotateZ, obj.scaleX, obj.scaleY, obj.scaleZ,obj.opacity)
+                        update(obj.x, obj.y, obj.z, obj.rotateX, obj.rotateY, obj.rotateZ, obj.scaleX, obj.scaleY, obj.scaleZ, obj.opacity)
                     }
 
                     return FrameFun
@@ -111,12 +158,12 @@
 
                 frames[frame.key] = buildFun(frame)
                 if (i === 0) {
-                    (function(frame) {
+                    (function (frame) {
 
-                            self.$nextTick(function () {
-                                self.updateFun(0.01)
-                                update(frame._x, frame._y, frame._z, frame._rotateX, frame._rotateY, frame._rotateZ, frame._scaleX, frame._scaleY, frame._scaleZ,frame._opacity)
-                            })
+                        self.$nextTick(function () {
+                            self.updateFun(0.01)
+                            update(frame._x, frame._y, frame._z, frame._rotateX, frame._rotateY, frame._rotateZ, frame._scaleX, frame._scaleY, frame._scaleZ, frame._opacity)
+                        })
 
                     })(frame);
 
@@ -129,11 +176,8 @@
             self.updateFun = keyframe(frames);
 
             self.$nextTick(function () {
-                setTimeout(function () {
-                    // self.$refs.dom.style.display='none'
-                    // self.updateFun(0)
-                    //   self.update()
-                })
+                css(self.$refs.dom, fixCss('transition','transform '+self.transitionTime));
+
             })
 
 
